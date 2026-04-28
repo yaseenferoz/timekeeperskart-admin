@@ -38,14 +38,14 @@ export default function Products() {
     load();
   }, []);
 
-  // ---------------- DELETE ----------------
+  // DELETE
   const handleDelete = async () => {
     await deleteProduct(confirmId);
     setConfirmId(null);
     load();
   };
 
-  // ---------------- EDIT ----------------
+  // EDIT
   const handleEditChange = (e) => {
     setEditProduct({ ...editProduct, [e.target.name]: e.target.value });
   };
@@ -58,12 +58,11 @@ export default function Products() {
     });
 
     await updateProduct(editProduct._id, formData);
-
     setEditProduct(null);
     load();
   };
 
-  // ---------------- ADD ----------------
+  // ADD
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -97,53 +96,59 @@ export default function Products() {
   };
 
   return (
-    <div>
+    <div className="p-4">
       {/* HEADER */}
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
         <h2 className="text-xl font-semibold">Products</h2>
 
         <button
           onClick={() => setShowModal(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg w-full sm:w-auto"
         >
           + Add Product
         </button>
       </div>
 
       {/* GRID */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {products.map((p) => (
           <div
             key={p._id}
-            className="bg-white rounded-xl shadow-sm hover:shadow-lg transition p-3 group"
+            className="bg-white rounded-xl shadow-sm hover:shadow-lg transition p-3"
           >
             <img
               src={p.images?.[0]}
               alt=""
-              className="h-40 w-full object-cover rounded-lg group-hover:scale-105 transition"
+              className="h-40 w-full object-cover rounded-lg"
             />
 
             <h4 className="mt-3 font-medium text-gray-800">{p.name}</h4>
             <p className="text-blue-600 font-semibold">₹{p.price}</p>
 
-            {/* ACTION ICONS */}
-            <div className="flex justify-end gap-4 mt-3 text-gray-600 text-lg">
-              <FaEye
-                className="cursor-pointer hover:text-blue-600"
-                onClick={() =>
-                  navigate(`/dashboard/products/${p._id}`)
-                }
-              />
+            {/* ACTIONS */}
+            <div className="flex justify-between items-center mt-3">
 
-              <FaEdit
-                className="cursor-pointer hover:text-green-600"
-                onClick={() => setEditProduct(p)}
-              />
+              {/* VIEW BUTTON (FIXED MOBILE ISSUE) */}
+              <button
+                onClick={() => navigate(`/dashboard/products/${p._id}`)}
+                className="text-sm bg-blue-500 text-white px-3 py-1 rounded-lg"
+              >
+                View
+              </button>
 
-              <FaTrash
-                className="cursor-pointer hover:text-red-600"
-                onClick={() => setConfirmId(p._id)}
-              />
+              {/* ICONS */}
+              <div className="flex gap-4 text-lg text-gray-600">
+                <FaEdit
+                  className="cursor-pointer hover:text-green-600"
+                  onClick={() => setEditProduct(p)}
+                />
+
+                <FaTrash
+                  className="cursor-pointer hover:text-red-600"
+                  onClick={() => setConfirmId(p._id)}
+                />
+              </div>
+
             </div>
           </div>
         ))}
@@ -153,9 +158,7 @@ export default function Products() {
       {confirmId && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-xl shadow-lg w-80 text-center">
-            <h3 className="text-lg font-semibold mb-2">
-              Delete Product
-            </h3>
+            <h3 className="text-lg font-semibold mb-2">Delete Product</h3>
             <p className="text-gray-500 mb-4">
               This action cannot be undone.
             </p>
@@ -183,11 +186,9 @@ export default function Products() {
       {editProduct && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-xl">
-            <h3 className="text-lg font-semibold mb-4">
-              Edit Product
-            </h3>
+            <h3 className="text-lg font-semibold mb-4">Edit Product</h3>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <input name="name" value={editProduct.name} onChange={handleEditChange} className="border p-2 rounded" />
               <input name="price" value={editProduct.price} onChange={handleEditChange} className="border p-2 rounded" />
               <input name="brand" value={editProduct.brand} onChange={handleEditChange} className="border p-2 rounded" />
@@ -218,11 +219,9 @@ export default function Products() {
       {showModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-xl">
-            <h3 className="text-lg font-semibold mb-4">
-              Add Product
-            </h3>
+            <h3 className="text-lg font-semibold mb-4">Add Product</h3>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <input name="name" placeholder="Name" onChange={handleChange} className="border p-2 rounded" />
               <input name="price" placeholder="Price" onChange={handleChange} className="border p-2 rounded" />
               <input name="brand" placeholder="Brand" onChange={handleChange} className="border p-2 rounded" />
@@ -238,7 +237,7 @@ export default function Products() {
               />
             </div>
 
-            <div className="flex gap-3 mt-4">
+            <div className="flex flex-col sm:flex-row gap-3 mt-4">
               <label className="border-2 border-dashed p-3 flex-1 text-center rounded cursor-pointer">
                 Upload Images
                 <input type="file" hidden multiple onChange={(e)=>setImages([...e.target.files])}/>
