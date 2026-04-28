@@ -6,7 +6,7 @@ import {
   createProduct,
 } from "../api/products";
 import { useNavigate } from "react-router-dom";
-import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 export default function Products() {
   const [products, setProducts] = useState([]);
@@ -25,7 +25,6 @@ export default function Products() {
   });
 
   const [images, setImages] = useState([]);
-  const [video, setVideo] = useState(null);
 
   const navigate = useNavigate();
 
@@ -75,7 +74,6 @@ export default function Products() {
     });
 
     images.forEach((img) => formData.append("images", img));
-    if (video) formData.append("video", video);
 
     await createProduct(formData);
 
@@ -90,7 +88,6 @@ export default function Products() {
       description: "",
     });
     setImages([]);
-    setVideo(null);
 
     load();
   };
@@ -125,10 +122,7 @@ export default function Products() {
             <h4 className="mt-3 font-medium text-gray-800">{p.name}</h4>
             <p className="text-blue-600 font-semibold">₹{p.price}</p>
 
-            {/* ACTIONS */}
             <div className="flex justify-between items-center mt-3">
-
-              {/* VIEW BUTTON (FIXED MOBILE ISSUE) */}
               <button
                 onClick={() => navigate(`/dashboard/products/${p._id}`)}
                 className="text-sm bg-blue-500 text-white px-3 py-1 rounded-lg"
@@ -136,7 +130,6 @@ export default function Products() {
                 View
               </button>
 
-              {/* ICONS */}
               <div className="flex gap-4 text-lg text-gray-600">
                 <FaEdit
                   className="cursor-pointer hover:text-green-600"
@@ -148,7 +141,6 @@ export default function Products() {
                   onClick={() => setConfirmId(p._id)}
                 />
               </div>
-
             </div>
           </div>
         ))}
@@ -182,39 +174,6 @@ export default function Products() {
         </div>
       )}
 
-      {/* EDIT MODAL */}
-      {editProduct && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-xl">
-            <h3 className="text-lg font-semibold mb-4">Edit Product</h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <input name="name" value={editProduct.name} onChange={handleEditChange} className="border p-2 rounded" />
-              <input name="price" value={editProduct.price} onChange={handleEditChange} className="border p-2 rounded" />
-              <input name="brand" value={editProduct.brand} onChange={handleEditChange} className="border p-2 rounded" />
-              <input name="gender" value={editProduct.gender} onChange={handleEditChange} className="border p-2 rounded" />
-
-              <textarea
-                name="description"
-                value={editProduct.description}
-                onChange={handleEditChange}
-                className="border p-2 rounded col-span-2"
-              />
-            </div>
-
-            <div className="flex justify-end gap-3 mt-4">
-              <button onClick={() => setEditProduct(null)} className="px-4 py-2 bg-gray-200 rounded">
-                Cancel
-              </button>
-
-              <button onClick={handleUpdate} className="px-4 py-2 bg-blue-600 text-white rounded">
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* ADD MODAL */}
       {showModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
@@ -237,16 +196,47 @@ export default function Products() {
               />
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 mt-4">
-              <label className="border-2 border-dashed p-3 flex-1 text-center rounded cursor-pointer">
+            {/* IMAGE UPLOAD */}
+            <div className="mt-4">
+              <label className="border-2 border-dashed p-3 w-full text-center rounded cursor-pointer block">
                 Upload Images
-                <input type="file" hidden multiple onChange={(e)=>setImages([...e.target.files])}/>
+                <input
+                  type="file"
+                  hidden
+                  multiple
+                  accept="image/*"
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files);
+                    setImages((prev) => [...prev, ...files]);
+                  }}
+                />
               </label>
 
-              <label className="border-2 border-dashed p-3 flex-1 text-center rounded cursor-pointer">
-                Upload Video
-                <input type="file" hidden onChange={(e)=>setVideo(e.target.files[0])}/>
-              </label>
+              {/* PREVIEW */}
+              {images.length > 0 && (
+                <div className="flex flex-wrap gap-3 mt-3">
+                  {images.map((img, index) => (
+                    <div
+                      key={index}
+                      className="relative w-20 h-20 rounded overflow-hidden border"
+                    >
+                      <img
+                        src={URL.createObjectURL(img)}
+                        className="w-full h-full object-cover"
+                      />
+
+                      <button
+                        onClick={() =>
+                          setImages(images.filter((_, i) => i !== index))
+                        }
+                        className="absolute top-1 right-1 bg-black/70 text-white text-xs px-1 rounded"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="flex justify-end gap-3 mt-4">
