@@ -80,9 +80,24 @@ const handleChange = (e) => {
 
       const formData = new FormData();
 
-      Object.keys(form).forEach((key) => {
-        if (form[key]) formData.append(key, form[key]);
-      });
+Object.keys(form).forEach((key) => {
+  if (form[key] !== "" && form[key] !== undefined) {
+    formData.append(key, form[key]);
+  }
+});
+
+// ✅ IMAGE SIZE VALIDATION (MOBILE FIX)
+if (images.length > 0) {
+  for (let img of images) {
+    if (img.size > 2 * 1024 * 1024) {
+      toast.error("Image must be under 2MB");
+      setLoading(false);
+      return;
+    }
+  }
+
+  images.forEach((img) => formData.append("images", img));
+}
 
       images.forEach((img) => formData.append("images", img));
 
@@ -206,11 +221,11 @@ const handleChange = (e) => {
 
       {/* ✅ ONLY SHOW FORM AFTER CATEGORY SELECT */}
       {form.category && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+         <div className="flex flex-col gap-3 md:grid md:grid-cols-2">
 
           {/* COMMON FIELDS */}
-          <input name="name" placeholder="Name" onChange={handleChange} className="border p-2 rounded" />
-          <input name="price" placeholder="Price" onChange={handleChange} className="border p-2 rounded" />
+          <input name="name" placeholder="Name" onChange={handleChange} className="border p-3 rounded w-full" />
+          <input name="price" placeholder="Price" onChange={handleChange} className="border p-3 rounded w-full" />
 
           <input
   name="brand"
@@ -219,37 +234,37 @@ const handleChange = (e) => {
   disabled
   className="border p-2 rounded bg-gray-100 cursor-not-allowed"
 />
-          <input name="gender" placeholder="Gender" onChange={handleChange} className="border p-2 rounded" />
+          <input name="gender" placeholder="Gender" onChange={handleChange} className="border p-3 rounded w-full" />
 
           {/* ✅ WATCH ONLY */}
           {form.category === "watch" && (
             <>
-              <input name="movement" placeholder="Movement" onChange={handleChange} className="border p-2 rounded" />
-              <input name="style" placeholder="Style" onChange={handleChange} className="border p-2 rounded" />
+              <input name="movement" placeholder="Movement" onChange={handleChange} className="border p-3 rounded w-full" />
+              <input name="style" placeholder="Style" onChange={handleChange} className="border p-3 rounded w-full" />
             </>
           )}
 
           {/* ✅ SMARTWATCH */}
           {form.category === "smartwatch" && (
             <>
-              <input name="battery" placeholder="Battery" onChange={handleChange} className="border p-2 rounded" />
-              <input name="display" placeholder="Display" onChange={handleChange} className="border p-2 rounded" />
+              <input name="battery" placeholder="Battery" onChange={handleChange} className="border p-3 rounded w-full" />
+              <input name="display" placeholder="Display" onChange={handleChange} className="border p-3 rounded w-full" />
             </>
           )}
 
           {/* ✅ SUNGLASSES */}
           {form.category === "sunglasses" && (
             <>
-              <input name="lens" placeholder="Lens Type" onChange={handleChange} className="border p-2 rounded" />
-              <input name="uv" placeholder="UV Protection" onChange={handleChange} className="border p-2 rounded" />
+              <input name="lens" placeholder="Lens Type" onChange={handleChange} className="border p-3 rounded w-full" />
+              <input name="uv" placeholder="UV Protection" onChange={handleChange} className="border p-3 rounded w-full" />
             </>
           )}
 
           {/* ✅ SHOES */}
           {form.category === "shoes" && (
             <>
-              <input name="size" placeholder="Size" onChange={handleChange} className="border p-2 rounded" />
-              <input name="material" placeholder="Material" onChange={handleChange} className="border p-2 rounded" />
+              <input name="size" placeholder="Size" onChange={handleChange} className="border p-3 rounded w-full" />
+              <input name="material" placeholder="Material" onChange={handleChange} className="border p-3 rounded w-full" />
             </>
           )}
 
@@ -375,28 +390,28 @@ const handleChange = (e) => {
           value={editProduct.name || ""}
           onChange={(e)=>setEditProduct({...editProduct,name:e.target.value})}
           placeholder="Name"
-          className="border p-2 rounded"
+          className="border p-3 rounded w-full"
         />
 
         <input
           value={editProduct.price || ""}
           onChange={(e)=>setEditProduct({...editProduct,price:e.target.value})}
           placeholder="Price"
-          className="border p-2 rounded"
+          className="border p-3 rounded w-full"
         />
 
         <input
           value={editProduct.brand || ""}
           onChange={(e)=>setEditProduct({...editProduct,brand:e.target.value})}
           placeholder="Brand"
-          className="border p-2 rounded"
+          className="border p-3 rounded w-full"
         />
 
         <input
           value={editProduct.gender || ""}
           onChange={(e)=>setEditProduct({...editProduct,gender:e.target.value})}
           placeholder="Gender"
-          className="border p-2 rounded"
+          className="border p-3 rounded w-full"
         />
 
         {/* WATCH */}
@@ -406,13 +421,13 @@ const handleChange = (e) => {
               value={editProduct.movement || ""}
               onChange={(e)=>setEditProduct({...editProduct,movement:e.target.value})}
               placeholder="Movement"
-              className="border p-2 rounded"
+              className="border p-3 rounded w-full"
             />
             <input
               value={editProduct.style || ""}
               onChange={(e)=>setEditProduct({...editProduct,style:e.target.value})}
               placeholder="Style"
-              className="border p-2 rounded"
+              className="border p-3 rounded w-full"
             />
           </>
         )}
@@ -430,7 +445,7 @@ const handleChange = (e) => {
                 }
               })}
               placeholder="Battery"
-              className="border p-2 rounded"
+              className="border p-3 rounded w-full"
             />
             <input
               value={editProduct.attributes?.display || ""}
@@ -442,7 +457,7 @@ const handleChange = (e) => {
                 }
               })}
               placeholder="Display"
-              className="border p-2 rounded"
+              className="border p-3 rounded w-full"
             />
           </>
         )}
@@ -460,7 +475,7 @@ const handleChange = (e) => {
                 }
               })}
               placeholder="Lens"
-              className="border p-2 rounded"
+              className="border p-3 rounded w-full"
             />
             <input
               value={editProduct.attributes?.uv || ""}
@@ -472,7 +487,7 @@ const handleChange = (e) => {
                 }
               })}
               placeholder="UV"
-              className="border p-2 rounded"
+              className="border p-3 rounded w-full"
             />
           </>
         )}
@@ -490,7 +505,7 @@ const handleChange = (e) => {
                 }
               })}
               placeholder="Size"
-              className="border p-2 rounded"
+              className="border p-3 rounded w-full"
             />
             <input
               value={editProduct.attributes?.material || ""}
@@ -502,7 +517,7 @@ const handleChange = (e) => {
                 }
               })}
               placeholder="Material"
-              className="border p-2 rounded"
+              className="border p-3 rounded w-full"
             />
           </>
         )}
