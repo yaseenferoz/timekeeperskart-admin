@@ -10,7 +10,6 @@ export default function ProductDetails() {
 
   const [form, setForm] = useState({});
   const [images, setImages] = useState([]);
-  const [video, setVideo] = useState(null);
 
   useEffect(() => {
     load();
@@ -34,13 +33,11 @@ export default function ProductDetails() {
     });
 
     images.forEach((img) => formData.append("images", img));
-    if (video) formData.append("video", video);
 
     await updateProduct(id, formData);
 
     setEditMode(false);
     setImages([]);
-    setVideo(null);
     load();
   };
 
@@ -48,6 +45,7 @@ export default function ProductDetails() {
 
   return (
     <div className="grid md:grid-cols-2 gap-6">
+
       {/* IMAGES */}
       <div className="grid grid-cols-2 gap-2">
         {product.images?.map((img, i) => (
@@ -61,15 +59,39 @@ export default function ProductDetails() {
 
       {/* DETAILS */}
       <div className="bg-white p-4 rounded-xl shadow">
+
         {editMode ? (
           <>
             <h2 className="font-semibold mb-3">Edit Product</h2>
 
             <div className="grid grid-cols-2 gap-3">
-              <input name="name" value={form.name} onChange={handleChange} className="border p-2 rounded" />
-              <input name="price" value={form.price} onChange={handleChange} className="border p-2 rounded" />
-              <input name="brand" value={form.brand} onChange={handleChange} className="border p-2 rounded" />
-              <input name="gender" value={form.gender} onChange={handleChange} className="border p-2 rounded" />
+              <input
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                className="border p-2 rounded"
+              />
+
+              <input
+                name="price"
+                value={form.price}
+                onChange={handleChange}
+                className="border p-2 rounded"
+              />
+
+              <input
+                name="brand"
+                value={form.brand}
+                onChange={handleChange}
+                className="border p-2 rounded"
+              />
+
+              <input
+                name="gender"
+                value={form.gender}
+                onChange={handleChange}
+                className="border p-2 rounded"
+              />
 
               <textarea
                 name="description"
@@ -79,24 +101,33 @@ export default function ProductDetails() {
               />
             </div>
 
-            {/* UPLOAD */}
-            <div className="flex gap-3 mt-4">
-              <label className="border-2 border-dashed p-3 flex-1 text-center rounded cursor-pointer">
+            {/* ✅ ONLY IMAGE UPLOAD */}
+            <div className="mt-4">
+              <label className="border-2 border-dashed p-3 w-full text-center rounded cursor-pointer block">
                 Upload Images
-                <input type="file" hidden multiple onChange={(e)=>setImages([...e.target.files])}/>
-              </label>
-
-              <label className="border-2 border-dashed p-3 flex-1 text-center rounded cursor-pointer">
-                Upload Video
-                <input type="file" hidden onChange={(e)=>setVideo(e.target.files[0])}/>
+                <input
+                  type="file"
+                  hidden
+                  multiple
+                  onChange={(e) =>
+                    setImages([...e.target.files])
+                  }
+                />
               </label>
             </div>
 
             <div className="flex gap-2 mt-4">
-              <button onClick={handleUpdate} className="bg-blue-600 text-white px-4 py-2 rounded">
+              <button
+                onClick={handleUpdate}
+                className="bg-blue-600 text-white px-4 py-2 rounded"
+              >
                 Save
               </button>
-              <button onClick={()=>setEditMode(false)} className="bg-gray-200 px-4 py-2 rounded">
+
+              <button
+                onClick={() => setEditMode(false)}
+                className="bg-gray-200 px-4 py-2 rounded"
+              >
                 Cancel
               </button>
             </div>
@@ -104,11 +135,13 @@ export default function ProductDetails() {
         ) : (
           <>
             <h2 className="text-xl font-bold">{product.name}</h2>
-            <p className="text-blue-600 font-semibold">₹{product.price}</p>
+            <p className="text-blue-600 font-semibold">
+              ₹{product.price}
+            </p>
 
             <p><b>Brand:</b> {product.brand}</p>
             <p><b>Gender:</b> {product.gender}</p>
-            <p>{product.description}</p>
+            <p className="mt-2">{product.description}</p>
 
             <button
               onClick={() => setEditMode(true)}
@@ -118,6 +151,7 @@ export default function ProductDetails() {
             </button>
           </>
         )}
+
       </div>
     </div>
   );
