@@ -15,7 +15,7 @@ export default function Products() {
   const [editProduct, setEditProduct] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  const [loading, setLoading] = useState(false); // ✅ NEW
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -25,6 +25,7 @@ export default function Products() {
     movement: "",
     style: "",
     description: "",
+    category: "", // ✅ NEW (added only)
   });
 
   const [images, setImages] = useState([]);
@@ -56,9 +57,22 @@ export default function Products() {
   };
 
   // ADD
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+const handleChange = (e) => {
+  const { name, value } = e.target;
+
+  if (name === "name") {
+    setForm((prev) => ({
+      ...prev,
+      name: value,
+      brand: value, // ✅ auto sync
+    }));
+  } else {
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
+};
 
   const handleAdd = async () => {
     try {
@@ -85,6 +99,7 @@ export default function Products() {
         movement: "",
         style: "",
         description: "",
+        category: "", // reset
       });
       setImages([]);
       load();
@@ -137,181 +152,391 @@ export default function Products() {
       {/* GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.map((p) => (
-          <div
-            key={p._id}
-            className="bg-white rounded-xl p-4 shadow hover:shadow-lg transition"
-          >
-            <img
-              src={p.images?.[0]}
-              className="h-40 w-full object-cover rounded-lg"
-            />
-
+          <div key={p._id} className="bg-white rounded-xl p-4 shadow">
+            <img src={p.images?.[0]} className="h-40 w-full object-cover rounded-lg" />
             <h4 className="mt-3 font-medium">{p.name}</h4>
             <p className="text-blue-600 font-semibold">₹{p.price}</p>
 
-            <div className="flex justify-between items-center mt-4">
-
-              {/* VIEW */}
+            <div className="flex justify-between mt-4">
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/dashboard/products/${p._id}`);
-                }}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm"
+                onClick={() => navigate(`/dashboard/products/${p._id}`)}
+                className="bg-blue-500 text-white px-3 py-1 rounded-lg text-sm"
               >
                 View
               </button>
 
-              {/* ICONS */}
               <div className="flex gap-2">
-
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setEditProduct(p);
-                  }}
-                  className="p-2 rounded-lg bg-blue-100 hover:bg-blue-200"
-                >
+                <button onClick={() => setEditProduct(p)} className="p-2 bg-blue-100 rounded-lg">
                   <FaEdit className="text-blue-600 text-sm" />
                 </button>
 
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setConfirmId(p._id);
-                  }}
-                  className="p-2 rounded-lg bg-red-100 hover:bg-red-200"
-                >
+                <button onClick={() => setConfirmId(p._id)} className="p-2 bg-red-100 rounded-lg">
                   <FaTrash className="text-red-600 text-sm" />
                 </button>
-
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* DELETE MODAL */}
-      {confirmId && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl w-full max-w-sm p-6 shadow text-center">
-            <h3 className="text-lg font-semibold mb-2">
-              Delete Product
-            </h3>
-
-            <p className="text-gray-500 mb-5">
-              This action cannot be undone.
-            </p>
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => setConfirmId(null)}
-                className="flex-1 bg-gray-200 py-2 rounded-lg"
-              >
-                Cancel
-              </button>
-
-              <button
-                onClick={handleDelete}
-                disabled={loading}
-                className="flex-1 bg-red-500 text-white py-2 rounded-lg flex items-center justify-center gap-2"
-              >
-                {loading && (
-                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                )}
-                {loading ? "Deleting..." : "Delete"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* EDIT MODAL */}
-      {editProduct && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-
-          <div className="bg-white w-full max-w-lg rounded-xl shadow-lg p-6">
-
-            <h3 className="text-lg font-semibold mb-4">
-              Edit Product
-            </h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-
-              <input value={editProduct.name} onChange={(e)=>setEditProduct({...editProduct,name:e.target.value})} className="border p-2 rounded" />
-              <input value={editProduct.price} onChange={(e)=>setEditProduct({...editProduct,price:e.target.value})} className="border p-2 rounded" />
-              <input value={editProduct.brand} onChange={(e)=>setEditProduct({...editProduct,brand:e.target.value})} className="border p-2 rounded" />
-              <input value={editProduct.gender} onChange={(e)=>setEditProduct({...editProduct,gender:e.target.value})} className="border p-2 rounded" />
-
-              <textarea value={editProduct.description} onChange={(e)=>setEditProduct({...editProduct,description:e.target.value})} className="border p-2 rounded col-span-1 sm:col-span-2" />
-
-            </div>
-
-            <div className="flex gap-3 mt-5">
-              <button onClick={()=>setEditProduct(null)} className="flex-1 bg-gray-200 py-2 rounded-lg">Cancel</button>
-
-              <button
-                onClick={handleUpdate}
-                disabled={loading}
-                className="flex-1 bg-blue-600 text-white py-2 rounded-lg flex items-center justify-center gap-2"
-              >
-                {loading && (
-                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                )}
-                {loading ? "Saving..." : "Save Changes"}
-              </button>
-            </div>
-
-          </div>
-        </div>
-      )}
-
       {/* ADD MODAL */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+   {/* ADD MODAL */}
+{showModal && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
 
-          <div className="bg-white w-full max-w-lg p-6 rounded-xl shadow-lg">
+    <div className="bg-white w-full max-w-lg p-6 rounded-xl shadow-lg">
 
-            <h3 className="text-lg font-semibold mb-4">
-              Add Product
-            </h3>
+      <h3 className="text-lg font-semibold mb-4">
+        Add Product
+      </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {/* ✅ CATEGORY FIRST */}
+      <select
+        name="category"
+        value={form.category}
+        onChange={handleChange}
+        className="border p-2 rounded w-full mb-4"
+      >
+        <option value="">Select Category</option>
+        <option value="watch">Watch</option>
+        <option value="smartwatch">Smartwatch</option>
+        <option value="sunglasses">Sunglasses</option>
+        <option value="shoes">Shoes</option>
+      </select>
 
-              <input name="name" placeholder="Name" onChange={handleChange} className="border p-2 rounded" />
-              <input name="price" placeholder="Price" onChange={handleChange} className="border p-2 rounded" />
+      {/* ✅ ONLY SHOW FORM AFTER CATEGORY SELECT */}
+      {form.category && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
-              <input name="brand" placeholder="Brand" onChange={handleChange} className="border p-2 rounded" />
-              <input name="gender" placeholder="Gender" onChange={handleChange} className="border p-2 rounded" />
+          {/* COMMON FIELDS */}
+          <input name="name" placeholder="Name" onChange={handleChange} className="border p-2 rounded" />
+          <input name="price" placeholder="Price" onChange={handleChange} className="border p-2 rounded" />
 
+          <input
+  name="brand"
+  value={form.brand}
+  placeholder="Brand"
+  disabled
+  className="border p-2 rounded bg-gray-100 cursor-not-allowed"
+/>
+          <input name="gender" placeholder="Gender" onChange={handleChange} className="border p-2 rounded" />
+
+          {/* ✅ WATCH ONLY */}
+          {form.category === "watch" && (
+            <>
               <input name="movement" placeholder="Movement" onChange={handleChange} className="border p-2 rounded" />
               <input name="style" placeholder="Style" onChange={handleChange} className="border p-2 rounded" />
+            </>
+          )}
 
-              <textarea name="description" placeholder="Description" onChange={handleChange} className="border p-2 rounded col-span-1 sm:col-span-2" />
+          {/* ✅ SMARTWATCH */}
+          {form.category === "smartwatch" && (
+            <>
+              <input name="battery" placeholder="Battery" onChange={handleChange} className="border p-2 rounded" />
+              <input name="display" placeholder="Display" onChange={handleChange} className="border p-2 rounded" />
+            </>
+          )}
 
-            </div>
+          {/* ✅ SUNGLASSES */}
+          {form.category === "sunglasses" && (
+            <>
+              <input name="lens" placeholder="Lens Type" onChange={handleChange} className="border p-2 rounded" />
+              <input name="uv" placeholder="UV Protection" onChange={handleChange} className="border p-2 rounded" />
+            </>
+          )}
 
-            <input type="file" multiple className="mt-4" onChange={(e)=>setImages([...e.target.files])} />
+          {/* ✅ SHOES */}
+          {form.category === "shoes" && (
+            <>
+              <input name="size" placeholder="Size" onChange={handleChange} className="border p-2 rounded" />
+              <input name="material" placeholder="Material" onChange={handleChange} className="border p-2 rounded" />
+            </>
+          )}
 
-            <div className="flex gap-3 mt-5">
-              <button onClick={()=>setShowModal(false)} className="flex-1 bg-gray-200 py-2 rounded-lg">Cancel</button>
+          <textarea
+            name="description"
+            placeholder="Description"
+            onChange={handleChange}
+            className="border p-2 rounded col-span-2"
+          />
 
-              <button
-                onClick={handleAdd}
-                disabled={loading}
-                className="flex-1 bg-blue-600 text-white py-2 rounded-lg flex items-center justify-center gap-2"
-              >
-                {loading && (
-                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                )}
-                {loading ? "Uploading..." : "Add Product"}
-              </button>
-            </div>
-
-          </div>
         </div>
       )}
 
+      {/* IMAGE UPLOAD */}
+{form.category && (
+  <>
+    <input
+      type="file"
+      multiple
+      className="mt-4"
+      onChange={(e) => setImages([...e.target.files])}
+    />
+
+    {/* ACTION BUTTONS */}
+    <div className="flex gap-3 mt-5">
+
+      {/* CANCEL */}
+      <button
+        onClick={() => {
+          setShowModal(false);
+          setForm({
+            name: "",
+            brand: "",
+            price: "",
+            gender: "",
+            movement: "",
+            style: "",
+            description: "",
+            category: "",
+          });
+          setImages([]);
+        }}
+        className="flex-1 bg-gray-200 py-2 rounded-lg"
+      >
+        Cancel
+      </button>
+
+      {/* ADD */}
+      <button
+        onClick={handleAdd}
+        disabled={loading}
+        className="flex-1 bg-blue-600 text-white py-2 rounded-lg flex items-center justify-center gap-2"
+      >
+        {loading && (
+          <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+        )}
+        {loading ? "Uploading..." : "Add Product"}
+      </button>
+
+    </div>
+  </>
+)}
+
+    </div>
+  </div>
+)}
+{confirmId && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div className="bg-white p-6 rounded-xl w-full max-w-sm text-center">
+
+      <h3 className="text-lg font-semibold mb-2">Delete Product</h3>
+      <p className="text-gray-500 mb-4">This action cannot be undone.</p>
+
+      <div className="flex gap-3">
+        <button
+          onClick={() => setConfirmId(null)}
+          className="flex-1 bg-gray-200 py-2 rounded-lg"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={handleDelete}
+          disabled={loading}
+          className="flex-1 bg-red-500 text-white py-2 rounded-lg flex items-center justify-center gap-2"
+        >
+          {loading && (
+            <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          )}
+          {loading ? "Deleting..." : "Delete"}
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
+{editProduct && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+
+    <div className="bg-white w-full max-w-lg p-6 rounded-xl">
+
+      <h3 className="text-lg font-semibold mb-4">Edit Product</h3>
+
+      {/* CATEGORY */}
+      <select
+        value={editProduct.category}
+        onChange={(e) =>
+          setEditProduct({ ...editProduct, category: e.target.value })
+        }
+        className="border p-2 rounded w-full mb-4"
+      >
+        <option value="">Select Category</option>
+        <option value="watch">Watch</option>
+        <option value="smartwatch">Smartwatch</option>
+        <option value="sunglasses">Sunglasses</option>
+        <option value="shoes">Shoes</option>
+      </select>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+        {/* COMMON */}
+        <input
+          value={editProduct.name || ""}
+          onChange={(e)=>setEditProduct({...editProduct,name:e.target.value})}
+          placeholder="Name"
+          className="border p-2 rounded"
+        />
+
+        <input
+          value={editProduct.price || ""}
+          onChange={(e)=>setEditProduct({...editProduct,price:e.target.value})}
+          placeholder="Price"
+          className="border p-2 rounded"
+        />
+
+        <input
+          value={editProduct.brand || ""}
+          onChange={(e)=>setEditProduct({...editProduct,brand:e.target.value})}
+          placeholder="Brand"
+          className="border p-2 rounded"
+        />
+
+        <input
+          value={editProduct.gender || ""}
+          onChange={(e)=>setEditProduct({...editProduct,gender:e.target.value})}
+          placeholder="Gender"
+          className="border p-2 rounded"
+        />
+
+        {/* WATCH */}
+        {editProduct.category === "watch" && (
+          <>
+            <input
+              value={editProduct.movement || ""}
+              onChange={(e)=>setEditProduct({...editProduct,movement:e.target.value})}
+              placeholder="Movement"
+              className="border p-2 rounded"
+            />
+            <input
+              value={editProduct.style || ""}
+              onChange={(e)=>setEditProduct({...editProduct,style:e.target.value})}
+              placeholder="Style"
+              className="border p-2 rounded"
+            />
+          </>
+        )}
+
+        {/* SMARTWATCH */}
+        {editProduct.category === "smartwatch" && (
+          <>
+            <input
+              value={editProduct.attributes?.battery || ""}
+              onChange={(e)=>setEditProduct({
+                ...editProduct,
+                attributes: {
+                  ...editProduct.attributes,
+                  battery: e.target.value
+                }
+              })}
+              placeholder="Battery"
+              className="border p-2 rounded"
+            />
+            <input
+              value={editProduct.attributes?.display || ""}
+              onChange={(e)=>setEditProduct({
+                ...editProduct,
+                attributes: {
+                  ...editProduct.attributes,
+                  display: e.target.value
+                }
+              })}
+              placeholder="Display"
+              className="border p-2 rounded"
+            />
+          </>
+        )}
+
+        {/* SUNGLASSES */}
+        {editProduct.category === "sunglasses" && (
+          <>
+            <input
+              value={editProduct.attributes?.lens || ""}
+              onChange={(e)=>setEditProduct({
+                ...editProduct,
+                attributes: {
+                  ...editProduct.attributes,
+                  lens: e.target.value
+                }
+              })}
+              placeholder="Lens"
+              className="border p-2 rounded"
+            />
+            <input
+              value={editProduct.attributes?.uv || ""}
+              onChange={(e)=>setEditProduct({
+                ...editProduct,
+                attributes: {
+                  ...editProduct.attributes,
+                  uv: e.target.value
+                }
+              })}
+              placeholder="UV"
+              className="border p-2 rounded"
+            />
+          </>
+        )}
+
+        {/* SHOES */}
+        {editProduct.category === "shoes" && (
+          <>
+            <input
+              value={editProduct.attributes?.size || ""}
+              onChange={(e)=>setEditProduct({
+                ...editProduct,
+                attributes: {
+                  ...editProduct.attributes,
+                  size: e.target.value
+                }
+              })}
+              placeholder="Size"
+              className="border p-2 rounded"
+            />
+            <input
+              value={editProduct.attributes?.material || ""}
+              onChange={(e)=>setEditProduct({
+                ...editProduct,
+                attributes: {
+                  ...editProduct.attributes,
+                  material: e.target.value
+                }
+              })}
+              placeholder="Material"
+              className="border p-2 rounded"
+            />
+          </>
+        )}
+
+        <textarea
+          value={editProduct.description || ""}
+          onChange={(e)=>setEditProduct({...editProduct,description:e.target.value})}
+          className="border p-2 rounded col-span-2"
+          placeholder="Description"
+        />
+
+      </div>
+
+      {/* ACTIONS */}
+      <div className="flex gap-3 mt-5">
+        <button
+          onClick={()=>setEditProduct(null)}
+          className="flex-1 bg-gray-200 py-2 rounded-lg"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={handleUpdate}
+          disabled={loading}
+          className="flex-1 bg-blue-600 text-white py-2 rounded-lg"
+        >
+          {loading ? "Saving..." : "Save"}
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
     </div>
   );
 }
