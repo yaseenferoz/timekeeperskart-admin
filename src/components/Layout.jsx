@@ -30,7 +30,7 @@ export default function Layout() {
         ${open ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
       >
         <h1 className="text-white text-xl font-semibold mb-6">
-          Timekeepers
+          Ma Quality Products
         </h1>
 
         <nav className="flex flex-col gap-2 flex-1">
